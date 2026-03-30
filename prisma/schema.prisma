@@ -1,0 +1,927 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserType {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  clerkId   String    @unique
+  email     String    @unique
+  firstName String?
+  lastName  String?
+  userType  UserType  @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  services  Service[]
+}
+
+model Category {
+  id           Int           @id @default(autoincrement())
+  name         String
+  serviceTypes ServiceType[]
+}
+
+model Country {
+  id            Int            @id @default(autoincrement())
+  name          String
+  iso           String
+  serviceYachts ServiceYacht[]
+}
+
+// Malaga es una de las 11 Provincias de Anadalucia, Andalucia es Estado de España
+// Regions = Comarca, Malaga cuenta con 9 Comarcas
+model MalagaRegion {
+  id           Int          @id @default(autoincrement())
+  name         String
+  services     Service[]
+  malagaCities MalagaCity[]
+}
+
+model MalagaCity {
+  id       Int          @id @default(autoincrement())
+  name     String
+  regionId Int
+  region   MalagaRegion @relation(fields: [regionId], references: [id])
+  services Service[]
+}
+
+model Language {
+  id                        Int                         @id @default(autoincrement())
+  name                      String
+  medicalCareHasLanguages   MedicalCareHasLanguages[]
+  securityGuardHasLanguages SecurityGuardHasLanguages[]
+  privateStaffHasLanguages  PrivateStaffHasLanguages[]
+  trainingCoachHasLanguages TrainingCoachHasLanguages[]
+}
+
+/**
+ * SERVICES *
+ */
+
+enum PriceModel {
+  FIXED
+  FROM
+  CONSULT
+}
+
+enum CallToActionType {
+  INTERNAL
+  EXTERNAL
+}
+
+model ServiceStatus {
+  id       Int       @id @default(autoincrement())
+  name     String
+  services Service[]
+}
+
+model ServiceType {
+  id         Int       @id @default(autoincrement())
+  name       String
+  key        String
+  slug       String
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  services   Service[]
+}
+
+model Service {
+  id                   Int                   @id @default(autoincrement())
+  serviceTypeId        Int
+  serviceType          ServiceType           @relation(fields: [serviceTypeId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  reference            String?               @db.VarChar(100)
+  title                String                @db.VarChar(100)
+  subtitle             String?               @db.VarChar(200)
+  shortDescription     String?               @db.VarChar(300)
+  longDescription      String?               @db.VarChar(1000)
+  regionId             Int
+  region               MalagaRegion          @relation(fields: [regionId], references: [id])
+  cityId               Int
+  city                 MalagaCity            @relation(fields: [cityId], references: [id])
+  district             String?
+  address              String?
+  postalCode           String?
+  locationUrl          String?
+  exclusiveListing     Boolean?
+  latitute             Float?
+  longitude            Float?
+  privacyLevel         Int
+  priceModel           PriceModel?
+  price                Float?
+  currency             String?
+  heroImage            String?
+  videoUrl             String?
+  callToActionType     CallToActionType      @default(EXTERNAL)
+  callToActionText     String?
+  callToActionUrl      String?
+  serviceStatusId      Int
+  serviceStatus        ServiceStatus         @relation(fields: [serviceStatusId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  userId               Int
+  user                 User                  @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  serviceHasDocuments  ServiceDocuments[]
+  serviceHasImages     ServiceImages[]
+  serviceRealEstate    ServiceRealEstate?
+  serviceLuxuryCar     ServiceLuxuryCar?
+  serviceYacht         ServiceYacht?
+  serviceJet           ServiceJet?
+  serviceLuxuryStay    ServiceLuxuryStay?
+  serviceMedicalCare   ServiceMedicalCare?
+  serviceSecurityGuard ServiceSecurityGuard?
+  servicePrivateEvent  ServicePrivateEvent?
+  servicePrivateStaff  ServicePrivateStaff?
+  serviceBeautySpa     ServiceBeautySpa?
+  serviceGolf          ServiceGolf?
+  serviceTrainingCoach ServiceTrainingCoach?
+}
+
+model ServiceDocuments {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  mimeType  String
+  url       String
+  serviceId Int
+  service   Service  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ServiceImages {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  mimeType  String
+  url       String
+  serviceId Int
+  service   Service  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ServiceModality {
+  SALE
+  RENT
+}
+
+/**
+ * SERVICE REAL ESTATE
+ */
+model RealEstateType {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  serviceRealEstates ServiceRealEstate[]
+}
+
+model RealEstateStayType {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  serviceRealEstates ServiceRealEstate[]
+}
+
+model RealEstateHousingStatus {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  serviceRealEstates ServiceRealEstate[]
+}
+
+model ServiceRealEstate {
+  id                        Int                      @id @default(autoincrement())
+  modality                  ServiceModality
+  realEstateTypeId          Int
+  realEstateType            RealEstateType           @relation(fields: [realEstateTypeId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  surfaceBuiltMt2           Float?
+  surfaceTerraceMt2         Float?
+  surfacePlotMt2            Float?
+  rooms                     Int?
+  fullBathrooms             Int?
+  halfBathrooms             Int?
+  /**
+   * Alquiler
+   */
+  realEstateStayTypeId      Int?
+  realEstateStayType        RealEstateStayType?      @relation(fields: [realEstateStayTypeId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  touristLicense            String?
+  guestsCapacity            Int?
+  realEstateHasServices     RealEstateHasServices[]
+  /**
+   * Venta
+   */
+  realEstateHousingStatusId Int?
+  realEstateHousingStatus   RealEstateHousingStatus? @relation(fields: [realEstateHousingStatusId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+
+  serviceId              Int                      @unique
+  service                Service                  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  realEstateHasAmenities RealEstateHasAmenities[]
+}
+
+model RealEstateService {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  lucideIcon            String?
+  realEstateHasServices RealEstateHasServices[]
+}
+
+model RealEstateHasServices {
+  id                  Int               @id @default(autoincrement())
+  serviceRealEstateId Int
+  serviceRealEstate   ServiceRealEstate @relation(fields: [serviceRealEstateId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  realEstateServiceId Int
+  realEstateService   RealEstateService @relation(fields: [realEstateServiceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model RealEstateAmenity {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  lucideIcon             String?
+  realEstateHasAmenities RealEstateHasAmenities[]
+}
+
+model RealEstateHasAmenities {
+  id                  Int               @id @default(autoincrement())
+  serviceRealEstateId Int
+  serviceRealEstate   ServiceRealEstate @relation(fields: [serviceRealEstateId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  realEstateAmenityId Int
+  realEstateAmenity   RealEstateAmenity @relation(fields: [realEstateAmenityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE REAL ESTATE
+ */
+
+/**
+ * SERVICE LUXURY CAR
+ */
+enum DriveMode {
+  SELFDRIVE
+  CHAUFFER
+}
+
+enum Transmission {
+  AUTOMATIC
+  MANUAL
+}
+
+enum MotorType {
+  GASOLINE
+  DIESEL
+  GAS
+  ELECTRIC
+  HYBRID
+}
+
+enum OwnerType {
+  SINGLE
+  MULTIPLE
+}
+
+model LuxuryCarColor {
+  id                         Int                @id @default(autoincrement())
+  name                       String
+  hex                        String
+  serviceLuxuryCarsExteriors ServiceLuxuryCar[] @relation("luxuryCarExteriorColor")
+  serviceLuxuryCarsInteriors ServiceLuxuryCar[] @relation("luxuryCarInteriorColor")
+}
+
+model LuxuryCarLegalSituation {
+  id                Int                @id @default(autoincrement())
+  name              String
+  serviceLuxuryCars ServiceLuxuryCar[]
+}
+
+model ServiceLuxuryCar {
+  id                        Int                      @id @default(autoincrement())
+  modality                  ServiceModality
+  brand                     String
+  model                     String
+  edition                   String?
+  year                      Int
+  transmission              Transmission?            @default(AUTOMATIC)
+  motorType                 MotorType?               @default(GASOLINE)
+  cv                        Int?
+  luxuryCarExteriorColorId  Int
+  luxuryCarExteriorColor    LuxuryCarColor           @relation(fields: [luxuryCarExteriorColorId], references: [id], name: "luxuryCarExteriorColor", onUpdate: Cascade, onDelete: Restrict)
+  luxuryCarInteriorColorId  Int
+  luxuryCarInteriorColor    LuxuryCarColor           @relation(fields: [luxuryCarInteriorColorId], references: [id], name: "luxuryCarInteriorColor", onUpdate: Cascade, onDelete: Restrict)
+  passengersCapacity        Int?
+  fullServiceHistory        Boolean                  @default(true)
+  /**
+   * RENTA
+   */
+  driveMode                 DriveMode?               @default(SELFDRIVE)
+  securityDeposit           Float?
+  dailyKilometers           Int?
+  minAge                    Int?
+  /**
+   * VENTA
+   */
+  kilometers                Int?
+  ownerType                 OwnerType?               @default(SINGLE)
+  luxuryCarLegalSituationId Int?
+  luxuryCarLegalSituation   LuxuryCarLegalSituation? @relation(fields: [luxuryCarLegalSituationId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+
+  serviceId             Int                     @unique
+  service               Service                 @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  luxuryCarHasAmenities LuxuryCarHasAmenities[]
+}
+
+model LuxuryCarAmenity {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  lucideIcon            String?
+  luxuryCarHasAmenities LuxuryCarHasAmenities[]
+}
+
+model LuxuryCarHasAmenities {
+  id                 Int              @id @default(autoincrement())
+  serviceLuxuryCarId Int
+  serviceLuxuryCar   ServiceLuxuryCar @relation(fields: [serviceLuxuryCarId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  luxuryCarAmenityId Int
+  luxuryCarAmenity   LuxuryCarAmenity @relation(fields: [luxuryCarAmenityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE LUXURY CAR
+ */
+
+/**
+ * SERVICE YACHTS
+ */
+model ServiceYacht {
+  id                 Int             @id @default(autoincrement())
+  modality           ServiceModality
+  shipyard           String?
+  model              String?
+  constructionYear   Int?
+  refitYear          Int?
+  minHours           Int?
+  maxHours           Int?
+  lengthMeters       Int?
+  maxSpeed           Int?
+  totalCabins        Int?
+  passengersCapacity Int?
+  /**
+   * RENTAL
+   */
+  port               String?
+  fuelPerformance    Float?
+  apa                Float?
+  /**
+   * SELL
+   */
+  motorHours         Int?
+  countryId          Int?
+  country            Country?        @relation(fields: [countryId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+
+  serviceId         Int                 @unique
+  service           Service             @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  yachtHasAmenities YachtHasAmenities[]
+  yachtTripulation  YachtTripulation[]
+}
+
+model YachtTripulationRole {
+  id               Int                @id @default(autoincrement())
+  name             String
+  yachtTripulation YachtTripulation[]
+}
+
+model YachtTripulation {
+  id                     Int                  @id @default(autoincrement())
+  name                   String
+  yachtTripulationRoleId Int
+  yachtTripulationRole   YachtTripulationRole @relation(fields: [yachtTripulationRoleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  serviceYachtId         Int
+  serviceYacht           ServiceYacht         @relation(fields: [serviceYachtId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model YachtAmenity {
+  id                      Int                 @id @default(autoincrement())
+  name                    String
+  lucideIcon              String?
+  yachtRentalHasAmenities YachtHasAmenities[]
+}
+
+model YachtHasAmenities {
+  id             Int          @id @default(autoincrement())
+  serviceYachtId Int
+  serviceYacht   ServiceYacht @relation(fields: [serviceYachtId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  yachtAmenityId Int
+  yachtAmenity   YachtAmenity @relation(fields: [yachtAmenityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE YACHTS
+ */
+
+/**
+ * SERVICE JET
+ */
+model JetCategory {
+  id          Int          @id @default(autoincrement())
+  name        String
+  serviceJets ServiceJet[]
+}
+
+model JetCatering {
+  id          Int          @id @default(autoincrement())
+  name        String
+  serviceJets ServiceJet[]
+}
+
+model ServiceJet {
+  id                 Int             @id @default(autoincrement())
+  modality           ServiceModality
+  model              String
+  jetCategoryId      Int
+  jetCategory        JetCategory     @relation(fields: [jetCategoryId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  nmRange            Float?
+  passengersCapacity Int
+  lengthMeters       Int
+  maxSpeed           Float?
+  /**
+   * RENTAL
+   */
+  jetCateringId      Int?
+  jetCatering        JetCatering?    @relation(fields: [jetCateringId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  /**
+   * SALE
+   */
+  totalHours         Int?
+
+  serviceId       Int               @unique
+  service         Service           @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  jetHasAmenities JetHasAmenities[]
+}
+
+model JetAmenity {
+  id                    Int               @id @default(autoincrement())
+  name                  String
+  lucideIcon            String?
+  jetRentalHasAmenities JetHasAmenities[]
+}
+
+model JetHasAmenities {
+  id           Int        @id @default(autoincrement())
+  serviceJetId Int
+  serviceJet   ServiceJet @relation(fields: [serviceJetId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  jetAmenityId Int
+  jetAmenity   JetAmenity @relation(fields: [jetAmenityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE JET
+ */
+
+/**
+ * SERVICE LUXURY STAY
+ */
+model LuxuryStayCategory {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  serviceLuxuryStays ServiceLuxuryStay[]
+}
+
+model LuxuryStayRoom {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  serviceLuxuryStays ServiceLuxuryStay[]
+}
+
+enum LuxuryStayCancelation {
+  STRICT
+  FLEXIBLE
+}
+
+model ServiceLuxuryStay {
+  id                     Int                      @id @default(autoincrement())
+  totalGuests            Int
+  checkIn                String
+  checkOut               String
+  cancelation            LuxuryStayCancelation
+  luxuryStayCategoryId   Int
+  luxuryStayCategory     LuxuryStayCategory       @relation(fields: [luxuryStayCategoryId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  luxuryStayRoomId       Int
+  luxuryStayRoom         LuxuryStayRoom           @relation(fields: [luxuryStayRoomId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  serviceId              Int                      @unique
+  service                Service                  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  luxuryStayHasAmenities LuxuryStayHasAmenities[]
+}
+
+model LuxuryStayAmenity {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  lucideIcon             String?
+  luxuryStayHasAmenities LuxuryStayHasAmenities[]
+}
+
+model LuxuryStayHasAmenities {
+  id                  Int               @id @default(autoincrement())
+  serviceLuxuryStayId Int
+  serviceLuxuryStay   ServiceLuxuryStay @relation(fields: [serviceLuxuryStayId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  luxuryStayAmenityId Int
+  luxuryStayAmenity   LuxuryStayAmenity @relation(fields: [luxuryStayAmenityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE LUXURY STAY
+ */
+
+/**
+ * SERVICE MEDICAL CARE
+ */
+enum MedicalCareResponse {
+  IMMEDIATELY
+  PREVIOUS_APPOINTMENT
+}
+
+model ServiceMedicalCare {
+  id                         Int                         @id @default(autoincrement())
+  certifications             String?
+  response                   MedicalCareResponse
+  isCleanupIncluded          Boolean?
+  isServiceAndTravelIncluded Boolean?
+  serviceId                  Int                         @unique
+  service                    Service                     @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  medicalCareHasServices     MedicalCareHasServices[]
+  medicalCareHasLanguages    MedicalCareHasLanguages[]
+  medicalCareHasSpecialties  MedicalCareHasSpecialties[]
+  medicalCareHasAttentions   MedicalCareHasAttentions[]
+}
+
+model MedicalCareAttention {
+  id                       Int                        @id @default(autoincrement())
+  name                     String
+  medicalCareHasAttentions MedicalCareHasAttentions[]
+}
+
+model MedicalCareHasAttentions {
+  id                     Int                   @id @default(autoincrement())
+  medicalCareAttentionId Int?
+  medicalCareAttention   MedicalCareAttention? @relation(fields: [medicalCareAttentionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  serviceMedicalCareId   Int?
+  serviceMedicalCare     ServiceMedicalCare?   @relation(fields: [serviceMedicalCareId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model MedicalCareHasLanguages {
+  id                   Int                @id @default(autoincrement())
+  serviceMedicalCareId Int
+  serviceMedicalCare   ServiceMedicalCare @relation(fields: [serviceMedicalCareId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  languageId           Int
+  language             Language           @relation(fields: [languageId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model MedicalCareSpecialty {
+  id                        Int                         @id @default(autoincrement())
+  name                      String
+  medicalCareHasSpecialties MedicalCareHasSpecialties[]
+}
+
+model MedicalCareHasSpecialties {
+  id                     Int                  @id @default(autoincrement())
+  serviceMedicalCareId   Int
+  serviceMedicalCare     ServiceMedicalCare   @relation(fields: [serviceMedicalCareId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  medicalCareSpecialtyId Int
+  medicalCareSpecialty   MedicalCareSpecialty @relation(fields: [medicalCareSpecialtyId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model MedicalCareService {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  lucideIcon             String?
+  medicalCareHasServices MedicalCareHasServices[]
+}
+
+model MedicalCareHasServices {
+  id                   Int                @id @default(autoincrement())
+  serviceMedicalCareId Int
+  serviceMedicalCare   ServiceMedicalCare @relation(fields: [serviceMedicalCareId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  medicalCareServiceId Int
+  medicalCareService   MedicalCareService @relation(fields: [medicalCareServiceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE MEDICAL CARE
+ */
+
+/**
+ * SERVICE SECURITY GUARD
+ */
+model SecurityGuardBackgroundType {
+  id                    Int                    @id @default(autoincrement())
+  name                  String
+  serviceSecurityGuards ServiceSecurityGuard[]
+}
+
+enum SecurityGuardDiscretion {
+  VISIBLE
+  INCOGNITO
+}
+
+enum SecurityGuardMinContractUnity {
+  HOURS
+  DAYS
+}
+
+model ServiceSecurityGuard {
+  id                            Int                           @id @default(autoincrement())
+  isArmed                       Boolean?                      @default(false)
+  discretion                    SecurityGuardDiscretion
+  minContractUnity              SecurityGuardMinContractUnity
+  minContractPeriod             Int
+  securityGuardBackgroundTypeId Int
+  securityGuardBackgroundType   SecurityGuardBackgroundType   @relation(fields: [securityGuardBackgroundTypeId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  serviceId                     Int                           @unique
+  service                       Service                       @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt                     DateTime                      @default(now())
+  updatedAt                     DateTime                      @updatedAt
+  securityGuardHasProfiles      SecurityGuardHasProfiles[]
+  securityGuardHasLanguages     SecurityGuardHasLanguages[]
+}
+
+model SecurityGuardHasLanguages {
+  id                     Int                  @id @default(autoincrement())
+  serviceSecurityGuardId Int
+  serviceSecurityGuard   ServiceSecurityGuard @relation(fields: [serviceSecurityGuardId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  languageId             Int
+  language               Language             @relation(fields: [languageId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model SecurityGuardProfile {
+  id                       Int                        @id @default(autoincrement())
+  name                     String
+  securityGuardHasProfiles SecurityGuardHasProfiles[]
+}
+
+model SecurityGuardHasProfiles {
+  id                     Int                  @id @default(autoincrement())
+  serviceSecurityGuardId Int
+  serviceSecurityGuard   ServiceSecurityGuard @relation(fields: [serviceSecurityGuardId], references: [id])
+  securityGuardProfileId Int
+  securityGuardProfile   SecurityGuardProfile @relation(fields: [securityGuardProfileId], references: [id])
+}
+
+/**
+ * SERVICE SECURITY GUARD
+ */
+
+/**
+ * SERVICE PRIVATE EVENT
+ */
+model PrivateEventType {
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  servicePrivateEvents ServicePrivateEvent[]
+}
+
+model ServicePrivateEvent {
+  id                       Int                        @id @default(autoincrement())
+  capacity                 Int
+  leadTimeDays             Int
+  privateEventTypeId       Int
+  privateEventType         PrivateEventType           @relation(fields: [privateEventTypeId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  serviceId                Int                        @unique
+  service                  Service                    @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  privateEventHasAmenities PrivateEventHasAmenities[]
+}
+
+model PrivateEventAmenity {
+  id                       Int                        @id @default(autoincrement())
+  name                     String
+  lucideIcon               String?
+  privateEventHasAmenities PrivateEventHasAmenities[]
+}
+
+model PrivateEventHasAmenities {
+  id                    Int                 @id @default(autoincrement())
+  servicePrivateEventId Int
+  servicePrivateEvent   ServicePrivateEvent @relation(fields: [servicePrivateEventId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  privateEventAmenityId Int
+  privateEventAmenity   PrivateEventAmenity @relation(fields: [privateEventAmenityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE PRIVATE EVENT
+ */
+
+/**
+ * SERVICE PRIVATE STAFF
+ */
+model PrivateStaffRole {
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  servicePrivateStaffs ServicePrivateStaff[]
+}
+
+enum PrivateStaffRegime {
+  LIVE_IN
+  LIVE_OUT
+  HOURLY
+}
+
+model ServicePrivateStaff {
+  id                            Int                             @id @default(autoincrement())
+  privateStaffRoleId            Int
+  privateStaffRole              PrivateStaffRole                @relation(fields: [privateStaffRoleId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  regime                        PrivateStaffRegime
+  hasVetting                    Boolean                         @default(false)
+  serviceId                     Int                             @unique
+  service                       Service                         @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt                     DateTime                        @default(now())
+  updatedAt                     DateTime                        @updatedAt
+  privateStaffHasQualifications PrivateStaffHasQualifications[]
+  privateStaffHasLanguages      PrivateStaffHasLanguages[]
+}
+
+model PrivateStaffHasLanguages {
+  id                    Int                 @id @default(autoincrement())
+  servicePrivateStaffId Int
+  servicePrivateStaff   ServicePrivateStaff @relation(fields: [servicePrivateStaffId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  languageId            Int
+  language              Language            @relation(fields: [languageId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model PrivateStaffQualification {
+  id                            Int                             @id @default(autoincrement())
+  name                          String
+  lucideIcon                    String?
+  privateStaffHasQualifications PrivateStaffHasQualifications[]
+}
+
+model PrivateStaffHasQualifications {
+  id                          Int                       @id @default(autoincrement())
+  servicePrivateStaffId       Int
+  servicePrivateStaff         ServicePrivateStaff       @relation(fields: [servicePrivateStaffId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  privateStaffQualificationId Int
+  privateStaffQualification   PrivateStaffQualification @relation(fields: [privateStaffQualificationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE PRIVATE STAFF
+ */
+
+/**
+ * SERVICE BEAUTY SPA
+ */
+model ServiceBeautySpa {
+  id                     Int                      @id @default(autoincrement())
+  durationMinutes        Int
+  hasEquipment           Boolean                  @default(false)
+  serviceId              Int                      @unique
+  service                Service                  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  beautySpaHasTreatments BeautySpaHasTreatments[]
+  beautySpaHasProducts   BeautySpaHasProducts[]
+}
+
+model BeautySpaTreatment {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  beautySpaHasTreatments BeautySpaHasTreatments[]
+}
+
+model BeautySpaHasTreatments {
+  id                   Int                @id @default(autoincrement())
+  serviceBeautySpaId   Int
+  serviceBeautySpa     ServiceBeautySpa   @relation(fields: [serviceBeautySpaId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  beautySpaTreatmentId Int
+  beautySpaTreatment   BeautySpaTreatment @relation(fields: [beautySpaTreatmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model BeautySpaProduct {
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  beautySpaHasProducts BeautySpaHasProducts[]
+}
+
+model BeautySpaHasProducts {
+  id                 Int              @id @default(autoincrement())
+  serviceBeautySpaId Int
+  serviceBeautySpa   ServiceBeautySpa @relation(fields: [serviceBeautySpaId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  beautySpaProductId Int
+  beautySpaProduct   BeautySpaProduct @relation(fields: [beautySpaProductId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE GOLF
+ */
+model ServiceGolf {
+  id                      Int                @id @default(autoincrement())
+  totalHoles              Int
+  handicapRequiredMale    Int?
+  handicapRequiredFemale  Int?
+  maxPlayers              Int
+  greenFee                Float?
+  conciergeFee            Float?
+  isElectricBuggyIncluded Boolean?
+  serviceId               Int                @unique
+  service                 Service            @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  golfHasAmenities        GolfHasAmenities[]
+}
+
+model GolfAmenity {
+  id               Int                @id @default(autoincrement())
+  name             String
+  lucideIcon       String?
+  golfHasAmenities GolfHasAmenities[]
+}
+
+model GolfHasAmenities {
+  id            Int         @id @default(autoincrement())
+  serviceGolfId Int
+  serviceGolf   ServiceGolf @relation(fields: [serviceGolfId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  golfAmenityId Int
+  golfAmenity   GolfAmenity @relation(fields: [golfAmenityId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+/**
+ * SERVICE GOLF
+ */
+
+/**
+ * SERVICE TRAINING COACH
+ */
+enum TrainingCoachLevel {
+  BEGINNER
+  AMATEUR
+  EXPERIENCED
+  PROFESSIONAL
+}
+
+enum TrainingCoachPlace {
+  PRIVATE_GYM
+  PUBLIC_GYM
+  IN_VILLA
+  OUTDOORS
+}
+
+enum TrainingCoachEquipment {
+  COACH_HAS
+  CLIENT_HAS
+}
+
+model ServiceTrainingCoach {
+  id        Int                    @id @default(autoincrement())
+  level     TrainingCoachLevel
+  place     TrainingCoachPlace
+  equipment TrainingCoachEquipment
+
+  serviceId                   Int                           @unique
+  service                     Service                       @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt                   DateTime                      @default(now())
+  updatedAt                   DateTime                      @updatedAt
+  trainingCoachHasLanguages   TrainingCoachHasLanguages[]
+  trainingCoachHasDisciplines TrainingCoachHasDisciplines[]
+}
+
+model TrainingCoachHasLanguages {
+  id                     Int                  @id @default(autoincrement())
+  serviceTrainingCoachId Int
+  serviceTrainingCoach   ServiceTrainingCoach @relation(fields: [serviceTrainingCoachId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  languageId             Int
+  language               Language             @relation(fields: [languageId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model TrainingCoachDiscipline {
+  id                          Int                           @id @default(autoincrement())
+  name                        String
+  trainingCoachHasDisciplines TrainingCoachHasDisciplines[]
+}
+
+model TrainingCoachHasDisciplines {
+  id                        Int                     @id @default(autoincrement())
+  serviceTrainingCoachId    Int
+  serviceTrainingCoach      ServiceTrainingCoach    @relation(fields: [serviceTrainingCoachId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  trainingCoachDisciplineId Int
+  trainingCoachDiscipline   TrainingCoachDiscipline @relation(fields: [trainingCoachDisciplineId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+}

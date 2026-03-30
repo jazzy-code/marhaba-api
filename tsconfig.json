@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "dist",
+
+    "module": "esnext",
+    "target": "ES2023",
+    "lib": ["esnext"],
+    "types": ["node", "express"],
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "strict": true,
+    "isolatedModules": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}
