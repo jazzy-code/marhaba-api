@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import { ServiceController } from './service.controller'
+import { requireAdmin } from '@/middlewares/admin.middleware'
+import { uploadFiles } from '@/middlewares/upload.middleware'
 
 const router = Router()
 
@@ -11,6 +13,9 @@ router.post('/', ServiceController.create)
 router.get('/', ServiceController.list)
 router.get('/:id', ServiceController.get)
 router.put('/:id', ServiceController.update)
+router.put('/:id/approve', requireAdmin, ServiceController.approve)
+router.put('/:id/reject', requireAdmin, ServiceController.reject)
+router.post('/:id/files', uploadFiles, ServiceController.uploadFiles)
 router.delete('/:id', ServiceController.delete)
 
 export default router

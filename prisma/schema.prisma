@@ -124,7 +124,8 @@ model Service {
   priceModel           PriceModel?
   price                Float?
   currency             String?
-  heroImage            String?
+  heroImageUrl         String?
+  providerLogoUrl      String?
   videoUrl             String?
   callToActionType     CallToActionType      @default(EXTERNAL)
   callToActionText     String?
@@ -135,8 +136,6 @@ model Service {
   user                 User                  @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
-  serviceHasDocuments  ServiceDocuments[]
-  serviceHasImages     ServiceImages[]
   serviceRealEstate    ServiceRealEstate?
   serviceLuxuryCar     ServiceLuxuryCar?
   serviceYacht         ServiceYacht?
@@ -149,24 +148,21 @@ model Service {
   serviceBeautySpa     ServiceBeautySpa?
   serviceGolf          ServiceGolf?
   serviceTrainingCoach ServiceTrainingCoach?
+  serviceFile          ServiceFile[]
 }
 
-model ServiceDocuments {
+enum FileType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+model ServiceFile {
   id        Int      @id @default(autoincrement())
   filename  String
   mimeType  String
   url       String
-  serviceId Int
-  service   Service  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ServiceImages {
-  id        Int      @id @default(autoincrement())
-  filename  String
-  mimeType  String
-  url       String
+  type      FileType
   serviceId Int
   service   Service  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   createdAt DateTime @default(now())

@@ -7,12 +7,16 @@ export const CategoryService = {
   },
 
   findAll: () => {
-    return prisma.category.findMany()
+    return prisma.category.findMany({
+      orderBy: { id: "asc" },
+      include: { serviceTypes: true }
+    })
   },
 
   findById: (id: number) => {
     return prisma.category.findUnique({
-      where: { id }
+      where: { id },
+      include: { serviceTypes: true }
     })
   },
 

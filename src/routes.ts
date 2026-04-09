@@ -4,6 +4,7 @@ import { requireAuth } from './middlewares/auth.middleware'
 import authRoutes from '@/modules/auth/auth.routes'
 import categoryRoutes from '@/modules/categories/category.routes'
 import servicesRoutes from '@/modules/services/service.routes'
+import servicesPublicRoutes from '@/modules/services/service.public.routes'
 import helpersRoutes from '@/modules/helpers/helpers.routes'
 
 import serviceRealEstateRoutes from '@/modules/serviceRealEstate/serviceRealEstate.routes'
@@ -20,6 +21,8 @@ import serviceMedicalCareRoutes from '@/modules/serviceMedicalCare/serviceMedica
 import serviceTraininCoachRoutes from '@/modules/serviceTrainingCoach/serviceTrainingCoach.routes'
 
 const router = Router()
+
+router.use('/public/services', servicesPublicRoutes)
 
 router.use('/auth', requireAuth, authRoutes)
 

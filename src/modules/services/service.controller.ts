@@ -27,15 +27,38 @@ export const ServiceController = {
     res.json(categories)
   },
 
+  listPublic: async (req: Request, res: Response) => {
+    const categories = await ServiceService.findAllPublic(req.query)
+    res.json(categories)
+  },
+
   get: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
     const category = await ServiceService.findById(id, req.user)
     res.json(category)
   },
 
+  getPublic: async (req: Request, res: Response) => {
+    const id = Number(req.params.id)
+    const category = await ServiceService.findByIdPublic(id)
+    res.json(category)
+  },
+
   update: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
     const category = await ServiceService.update(id, req.body)
+    res.json(category)
+  },
+
+  approve: async (req: Request, res: Response) => {
+    const id = Number(req.params.id)
+    const category = await ServiceService.approve(id)
+    res.json(category)
+  },
+
+  reject: async (req: Request, res: Response) => {
+    const id = Number(req.params.id)
+    const category = await ServiceService.reject(id)
     res.json(category)
   },
 
@@ -59,4 +82,18 @@ export const ServiceController = {
     const list = await ServiceService.findAllStats(req.user)
     res.json(list)
   },
+
+  uploadFiles: async (req: Request, res: Response) => {
+    const id = Number(req.params.id)
+
+    const files = req.files as {
+      heroImage?: Express.Multer.File[]
+      providerLogo?: Express.Multer.File[]
+      galleryFiles?: Express.Multer.File[]
+    }
+
+    const result = await ServiceService.uploadFiles(id, files)
+
+    res.json(result)
+  }
 }

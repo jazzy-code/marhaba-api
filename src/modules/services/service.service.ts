@@ -13,6 +13,7 @@ import { ServiceBeautySpaService } from "../serviceBeautySpa/serviceBeautySpa.se
 import { ServiceGolfService } from "../serviceGolf/serviceGolf.service";
 import { ServiceTrainingCoachService } from "../serviceTrainingCoach/serviceTrainingCoach.service";
 import { nullToEmptyString } from "@/utils/serviceFields";
+import { getSignedUrlFromS3, uploadToS3 } from "@/services/s3.service";
 
 
 const serviceModules: Record<string, any> = {
@@ -55,14 +56,95 @@ export const ServiceService = {
     const order = params.order || "desc"
     const search = params.search
     const serviceSlug = params.slug
+    const statusIds = params.statusIds
 
     const where: any = {}
     if (search) {
-      where.title = { contains: search }
+      where.title = { contains: search, mode: "insensitive" }
     }
     // Validate if user is ADMIN or USER to fetch all or only user's services
     if (user.userType !== "ADMIN") {
       where.userId = user.id
+    }
+
+    if (serviceSlug) {
+      where.serviceType = { slug: serviceSlug }
+    }
+
+    // Validate statusIds
+    if (statusIds) {
+      const statusIdsArray = statusIds.split(',').map((id: string) => Number(id))
+      where.serviceStatusId = { in: statusIdsArray }
+    }
+
+    const [data, total] = await Promise.all([
+      prisma.service.findMany({
+        where,
+        skip,
+        take: size,
+        orderBy: { [sort]: order },
+        include: {
+          serviceType: true,
+          serviceStatus: true,
+          user: true,
+          city: true,
+          region: true,
+
+          // Services
+          serviceRealEstate: true,
+          serviceLuxuryCar: true,
+          serviceYacht: true,
+          serviceJet: true,
+          serviceLuxuryStay: true,
+          serviceMedicalCare: true,
+          serviceSecurityGuard: true,
+          servicePrivateEvent: true,
+          servicePrivateStaff: true,
+          serviceBeautySpa: true,
+          serviceGolf: true,
+          serviceTrainingCoach: true,
+        }
+      }),
+      prisma.service.count({
+        where
+      }),
+    ])
+
+    const dataWithSignedUrls = await Promise.all(
+      data.map(async (service) => ({
+        ...service,
+        heroImageUrl: service.heroImageUrl
+          ? await getSignedUrlFromS3(service.heroImageUrl)
+          : null,
+        providerLogoUrl: service.providerLogoUrl
+          ? await getSignedUrlFromS3(service.providerLogoUrl)
+          : null,
+      }))
+    )
+
+    return {
+      data: dataWithSignedUrls,
+      total,
+      page,
+      size,
+      totalPages: Math.ceil(total / size)
+    }
+  },
+
+  findAllPublic: async (params: any) => {
+    const page = Number(params.page) || 1
+    const size = Number(params.size) || 10
+    const skip = (page - 1) * size
+    const sort = params.sort || "createdAt"
+    const order = params.order || "desc"
+    const search = params.search
+    const serviceSlug = params.slug
+
+    const where: any = {
+      serviceStatusId: 2 // Only fetch Approved services
+    }
+    if (search) {
+      where.title = { contains: search, mode: "insensitive" }
     }
 
     if (serviceSlug) {
@@ -79,6 +161,8 @@ export const ServiceService = {
           serviceType: true,
           serviceStatus: true,
           user: true,
+          city: true,
+          region: true,
 
           // Services
           serviceRealEstate: true,
@@ -119,7 +203,6 @@ export const ServiceService = {
       where,
       include: {
         serviceType: true,
-        serviceStatus: true,
         user: true,
         city: true,
         region: true,
@@ -133,16 +216,47 @@ export const ServiceService = {
                 realEstateAmenity: true
               }
             },
-            realEstateHasServices: { 
-              include: { 
+            realEstateHasServices: {
+              include: {
                 realEstateService: true
-              } 
+              }
             }
-          } 
+          }
         },
-        serviceLuxuryCar: { include: { luxuryCarHasAmenities: { include: { luxuryCarAmenity: true } } } },
-        serviceYacht: true,
-        serviceJet: true,
+        serviceLuxuryCar: {
+          include: {
+            luxuryCarHasAmenities: {
+              include: {
+                luxuryCarAmenity: true
+              }
+            },
+            luxuryCarExteriorColor: true,
+            luxuryCarInteriorColor: true,
+            luxuryCarLegalSituation: true
+          }
+        },
+        serviceYacht: {
+          include: {
+            yachtHasAmenities: {
+              include: {
+                yachtAmenity: true
+              }
+            },
+            yachtTripulation: true,
+            country: true
+          }
+        },
+        serviceJet: {
+          include: {
+            jetHasAmenities: {
+              include: {
+                jetAmenity: true
+              }
+            },
+            jetCategory: true,
+            jetCatering: true
+          }
+        },
         serviceLuxuryStay: {
           include: {
             luxuryStayCategory: true,
@@ -154,13 +268,229 @@ export const ServiceService = {
             }
           }
         },
-        serviceMedicalCare: true,
+        serviceMedicalCare: {
+          include: {
+            medicalCareHasServices: { include: { serviceMedicalCare: true } },
+            medicalCareHasLanguages: { include: { language: true } },
+            medicalCareHasSpecialties: { include: { medicalCareSpecialty: true } },
+            medicalCareHasAttentions: { include: { medicalCareAttention: true } }
+          }
+        },
         serviceSecurityGuard: { include: { securityGuardHasProfiles: true, securityGuardHasLanguages: true } },
-        servicePrivateEvent: true,
-        servicePrivateStaff: true,
-        serviceBeautySpa: true,
-        serviceGolf: true,
-        serviceTrainingCoach: true,
+        servicePrivateEvent: {
+          include: {
+            privateEventHasAmenities: {
+              include: {
+                privateEventAmenity: true
+              }
+            }
+          }
+        },
+        servicePrivateStaff: {
+          include: {
+            privateStaffRole: true,
+            privateStaffHasQualifications: {
+              include: {
+                privateStaffQualification: true
+              }
+            },
+            privateStaffHasLanguages: {
+              include: {
+                language: true
+              }
+            }
+          }
+        },
+        serviceBeautySpa: {
+          include: {
+            beautySpaHasProducts: {
+              include: {
+                beautySpaProduct: true
+              }
+            },
+            beautySpaHasTreatments: {
+              include: {
+                beautySpaTreatment: true
+              }
+            }
+          }
+        },
+        serviceGolf: {
+          include: {
+            golfHasAmenities: {
+              include: {
+                golfAmenity: true
+              }
+            }
+          }
+        },
+        serviceTrainingCoach: {
+          include: {
+            trainingCoachHasDisciplines: {
+              include: {
+                trainingCoachDiscipline: true
+              }
+            },
+            trainingCoachHasLanguages: {
+              include: {
+                language: true
+              }
+            }
+          }
+        },
+      }
+    })
+
+    if (!service) {
+      throw new HTTPError(404, "Service not found")
+    }
+
+    service.heroImageUrl = service.heroImageUrl ? await getSignedUrlFromS3(service.heroImageUrl) : null
+    service.providerLogoUrl = service.providerLogoUrl ? await getSignedUrlFromS3(service.providerLogoUrl) : null
+
+    return nullToEmptyString(service)
+  },
+
+  findByIdPublic: async (id: number) => {
+    const service = await prisma.service.findUnique({
+      where: { serviceStatusId: 2, id },
+      include: {
+        serviceType: true,
+        user: true,
+        city: true,
+        region: true,
+
+        // Services
+        serviceRealEstate: {
+          include: {
+            realEstateType: true,
+            realEstateHasAmenities: {
+              include: {
+                realEstateAmenity: true
+              }
+            },
+            realEstateHasServices: {
+              include: {
+                realEstateService: true
+              }
+            }
+          }
+        },
+        serviceLuxuryCar: {
+          include: {
+            luxuryCarHasAmenities: {
+              include: {
+                luxuryCarAmenity: true
+              }
+            },
+            luxuryCarExteriorColor: true,
+            luxuryCarInteriorColor: true,
+            luxuryCarLegalSituation: true
+          }
+        },
+        serviceYacht: {
+          include: {
+            yachtHasAmenities: {
+              include: {
+                yachtAmenity: true
+              }
+            },
+            yachtTripulation: true,
+            country: true
+          }
+        },
+        serviceJet: {
+          include: {
+            jetHasAmenities: {
+              include: {
+                jetAmenity: true
+              }
+            },
+            jetCategory: true,
+            jetCatering: true
+          }
+        },
+        serviceLuxuryStay: {
+          include: {
+            luxuryStayCategory: true,
+            luxuryStayRoom: true,
+            luxuryStayHasAmenities: {
+              include: {
+                luxuryStayAmenity: true
+              }
+            }
+          }
+        },
+        serviceMedicalCare: {
+          include: {
+            medicalCareHasServices: { include: { serviceMedicalCare: true } },
+            medicalCareHasLanguages: { include: { language: true } },
+            medicalCareHasSpecialties: { include: { medicalCareSpecialty: true } },
+            medicalCareHasAttentions: { include: { medicalCareAttention: true } }
+          }
+        },
+        serviceSecurityGuard: { include: { securityGuardHasProfiles: true, securityGuardHasLanguages: true } },
+        servicePrivateEvent: {
+          include: {
+            privateEventHasAmenities: {
+              include: {
+                privateEventAmenity: true
+              }
+            }
+          }
+        },
+        servicePrivateStaff: {
+          include: {
+            privateStaffRole: true,
+            privateStaffHasQualifications: {
+              include: {
+                privateStaffQualification: true
+              }
+            },
+            privateStaffHasLanguages: {
+              include: {
+                language: true
+              }
+            }
+          }
+        },
+        serviceBeautySpa: {
+          include: {
+            beautySpaHasProducts: {
+              include: {
+                beautySpaProduct: true
+              }
+            },
+            beautySpaHasTreatments: {
+              include: {
+                beautySpaTreatment: true
+              }
+            }
+          }
+        },
+        serviceGolf: {
+          include: {
+            golfHasAmenities: {
+              include: {
+                golfAmenity: true
+              }
+            }
+          }
+        },
+        serviceTrainingCoach: {
+          include: {
+            trainingCoachHasDisciplines: {
+              include: {
+                trainingCoachDiscipline: true
+              }
+            },
+            trainingCoachHasLanguages: {
+              include: {
+                language: true
+              }
+            }
+          }
+        },
       }
     })
 
@@ -183,6 +513,36 @@ export const ServiceService = {
     return module.update(id, data)
   },
 
+  approve: async (id: number) => {
+    const service = await prisma.service.findUnique({
+      where: { id }
+    })
+
+    if (!service) {
+      throw new HTTPError(404, "Service not found")
+    }
+
+    return await prisma.service.update({
+      where: { id },
+      data: { serviceStatusId: 2 }
+    })
+  },
+
+  reject: async (id: number) => {
+    const service = await prisma.service.findUnique({
+      where: { id }
+    })
+
+    if (!service) {
+      throw new HTTPError(404, "Service not found")
+    }
+
+    return await prisma.service.update({
+      where: { id },
+      data: { serviceStatusId: 3 }
+    })
+  },
+
   delete: async (id: number) => {
     const service = await prisma.service.findUnique({
       where: { id }
@@ -197,6 +557,61 @@ export const ServiceService = {
     })
   },
 
+  // Files
+  uploadFiles: async (serviceId: number, files: any) => {
+    // Hero Image
+    if (files?.heroImage?.[0]) {
+      const result = await uploadToS3(
+        files.heroImage[0],
+        serviceId,
+        "heroImage"
+      )
+
+      await prisma.service.update({
+        where: { id: serviceId },
+        data: {
+          heroImageUrl: result.key
+        }
+      })
+    }
+
+    // Provider Logo
+    if (files?.providerLogo?.[0]) {
+      const result = await uploadToS3(
+        files.providerLogo[0],
+        serviceId,
+        "providerLogo"
+      )
+
+      await prisma.service.update({
+        where: { id: serviceId },
+        data: {
+          providerLogoUrl: result.key
+        }
+      })
+    }
+
+    // 🟢 GALLERY FILES
+    if (files?.galleryFiles?.length) {
+      for (const file of files.galleryFiles) {
+        const result = await uploadToS3(file, serviceId, "galleryFiles")
+
+        await prisma.serviceFile.create({
+          data: {
+            filename: result.fileName,
+            mimeType: file.mimetype,
+            url: result.key,
+            type: result.fileType,
+            serviceId: Number(serviceId)
+          }
+        })
+      }
+    }
+
+    return { message: "Files uploaded successfully" }
+  },
+
+  // Helpers
   findAllTypes: () => prisma.serviceType.findMany(),
 
   findAllStatus: () => prisma.serviceStatus.findMany(),
@@ -207,7 +622,7 @@ export const ServiceService = {
     if (user.userType !== "ADMIN") {
       where.userId = user.id
     }
-    
+
     const [total, totalPending, totalApproved, totalRejected] = await Promise.all([
       prisma.service.count({
         where

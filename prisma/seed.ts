@@ -1,5 +1,6 @@
 // prisma/seed.ts
 import prisma from "../src/lib/prisma"
+import { seedCategories } from "./seeders/categories.seeder"
 import { seedCountries } from "./seeders/countries.seeder"
 import { seedLanguages } from "./seeders/languajes.seeder"
 import { seedMalagaRegions } from "./seeders/malagaRegions.seeder"
@@ -22,6 +23,7 @@ import { seedUsers } from "./seeders/users.seeder"
 async function main() {
   console.log("🌱 Starting seeding...")
 
+  await seedCategories(prisma)
   await seedCountries(prisma)
   await seedMalagaRegions(prisma)
   await seedLanguages(prisma)

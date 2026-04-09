@@ -17,7 +17,8 @@ export const SERVICE_FIELDS = [
   "priceModel",
   "price",
   "currency",
-  "heroImage",
+  "heroImageUrl",
+  "providerLogoUrl",
   "videoUrl",
   "serviceStatusId",
   "userId"

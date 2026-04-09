@@ -22,11 +22,11 @@
     "moduleDetection": "force",
     "moduleResolution": "bundler",
 
-    "baseUrl": ".",
+    // "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "prisma", "prisma*"],
   "exclude": ["node_modules"]
 }
