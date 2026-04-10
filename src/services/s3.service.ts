@@ -1,9 +1,11 @@
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 import { v4 as uuid } from "uuid"
 import { getFileType, FileType } from "../utils/fileType"
 import { s3Client } from "@/config/s3Client"
 import { env } from "@/config/env"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+
+const S3_BUCKET = env.AWS_S3_BUCKET_NAME
 
 export const uploadToS3 = async (
   file: Express.Multer.File,
@@ -19,7 +21,7 @@ export const uploadToS3 = async (
   } else if (folder === "providerLogo") {
     basePath = `services/${serviceId}/providerLogo`
   } else {
-    basePath = `services/${serviceId}/${fileType}s`
+    basePath = `services/${serviceId}/${fileType.toLowerCase()}s`
   }
 
   const extension = file.originalname.split(".").pop()
@@ -29,7 +31,7 @@ export const uploadToS3 = async (
 
   await s3Client.send(
     new PutObjectCommand({
-      Bucket: env.AWS_S3_BUCKET_NAME,
+      Bucket: S3_BUCKET,
       Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,
@@ -39,7 +41,7 @@ export const uploadToS3 = async (
 
   return {
     key,
-    url: `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`,
+    url: `https://${S3_BUCKET}.s3.amazonaws.com/${key}`,
     fileName,
     fileType
   }
@@ -47,7 +49,7 @@ export const uploadToS3 = async (
 
 export const getSignedUrlFromS3 = async (key: string) => {
   const command = new GetObjectCommand({
-    Bucket: env.AWS_S3_BUCKET_NAME,
+    Bucket: S3_BUCKET,
     Key: key
   })
 
@@ -56,4 +58,15 @@ export const getSignedUrlFromS3 = async (key: string) => {
   })
 
   return url
+}
+
+export const deleteFromS3 = async (url: string) => {
+  const key = url.split(".amazonaws.com/")[1]
+
+  await s3Client.send(
+    new DeleteObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key
+    })
+  )
 }

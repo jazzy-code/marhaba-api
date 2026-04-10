@@ -148,7 +148,7 @@ model Service {
   serviceBeautySpa     ServiceBeautySpa?
   serviceGolf          ServiceGolf?
   serviceTrainingCoach ServiceTrainingCoach?
-  serviceFile          ServiceFile[]
+  serviceFiles         ServiceFile[]
 }
 
 enum FileType {

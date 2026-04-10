@@ -92,7 +92,9 @@ export const ServiceController = {
       galleryFiles?: Express.Multer.File[]
     }
 
-    const result = await ServiceService.uploadFiles(id, files)
+    const existingFileIds = req.body.existingFileIds
+
+    const result = await ServiceService.uploadFiles(id, files, existingFileIds)
 
     res.json(result)
   }

@@ -13,7 +13,7 @@ import { ServiceBeautySpaService } from "../serviceBeautySpa/serviceBeautySpa.se
 import { ServiceGolfService } from "../serviceGolf/serviceGolf.service";
 import { ServiceTrainingCoachService } from "../serviceTrainingCoach/serviceTrainingCoach.service";
 import { nullToEmptyString } from "@/utils/serviceFields";
-import { getSignedUrlFromS3, uploadToS3 } from "@/services/s3.service";
+import { deleteFromS3, getSignedUrlFromS3, uploadToS3 } from "@/services/s3.service";
 
 
 const serviceModules: Record<string, any> = {
@@ -110,20 +110,20 @@ export const ServiceService = {
       }),
     ])
 
-    const dataWithSignedUrls = await Promise.all(
-      data.map(async (service) => ({
-        ...service,
-        heroImageUrl: service.heroImageUrl
-          ? await getSignedUrlFromS3(service.heroImageUrl)
-          : null,
-        providerLogoUrl: service.providerLogoUrl
-          ? await getSignedUrlFromS3(service.providerLogoUrl)
-          : null,
-      }))
-    )
+    // const dataWithSignedUrls = await Promise.all(
+    //   data.map(async (service) => ({
+    //     ...service,
+    //     heroImageUrl: service.heroImageUrl
+    //       ? await getSignedUrlFromS3(service.heroImageUrl)
+    //       : null,
+    //     providerLogoUrl: service.providerLogoUrl
+    //       ? await getSignedUrlFromS3(service.providerLogoUrl)
+    //       : null,
+    //   }))
+    // )
 
     return {
-      data: dataWithSignedUrls,
+      data,
       total,
       page,
       size,
@@ -203,9 +203,11 @@ export const ServiceService = {
       where,
       include: {
         serviceType: true,
+        serviceStatus: true,
         user: true,
         city: true,
         region: true,
+        serviceFiles: true,
 
         // Services
         serviceRealEstate: {
@@ -345,9 +347,6 @@ export const ServiceService = {
       throw new HTTPError(404, "Service not found")
     }
 
-    service.heroImageUrl = service.heroImageUrl ? await getSignedUrlFromS3(service.heroImageUrl) : null
-    service.providerLogoUrl = service.providerLogoUrl ? await getSignedUrlFromS3(service.providerLogoUrl) : null
-
     return nullToEmptyString(service)
   },
 
@@ -359,6 +358,7 @@ export const ServiceService = {
         user: true,
         city: true,
         region: true,
+        serviceFiles: true,
 
         // Services
         serviceRealEstate: {
@@ -558,8 +558,34 @@ export const ServiceService = {
   },
 
   // Files
-  uploadFiles: async (serviceId: number, files: any) => {
-    // Hero Image
+  uploadFiles: async (
+    serviceId: number,
+    files: any,
+    existingFileIds: number[] = []
+  ) => {
+    const currentFiles = await prisma.serviceFile.findMany({
+      where: { serviceId }
+    })
+
+    console.log("existingFileIds", existingFileIds)
+
+    const filesToDelete = currentFiles.filter(
+      (file) => !existingFileIds.includes(file.id)
+    )
+
+    console.log("filesToDelete", filesToDelete)
+
+    await Promise.all(
+      filesToDelete.map(async (file) => {
+        await deleteFromS3(file.url)
+
+        await prisma.serviceFile.delete({
+          where: { id: file.id }
+        })
+      })
+    )
+
+    // 🟡 HERO IMAGE
     if (files?.heroImage?.[0]) {
       const result = await uploadToS3(
         files.heroImage[0],
@@ -567,15 +593,24 @@ export const ServiceService = {
         "heroImage"
       )
 
+      // 🔥 opcional: borrar anterior
+      const service = await prisma.service.findUnique({
+        where: { id: serviceId }
+      })
+
+      if (service?.heroImageUrl) {
+        await deleteFromS3(service.heroImageUrl)
+      }
+
       await prisma.service.update({
         where: { id: serviceId },
         data: {
-          heroImageUrl: result.key
+          heroImageUrl: result.url
         }
       })
     }
 
-    // Provider Logo
+    // 🟡 PROVIDER LOGO
     if (files?.providerLogo?.[0]) {
       const result = await uploadToS3(
         files.providerLogo[0],
@@ -583,32 +618,42 @@ export const ServiceService = {
         "providerLogo"
       )
 
+      const service = await prisma.service.findUnique({
+        where: { id: serviceId }
+      })
+
+      if (service?.providerLogoUrl) {
+        await deleteFromS3(service.providerLogoUrl)
+      }
+
       await prisma.service.update({
         where: { id: serviceId },
         data: {
-          providerLogoUrl: result.key
+          providerLogoUrl: result.url
         }
       })
     }
 
-    // 🟢 GALLERY FILES
+    // 🟢 NUEVOS GALLERY FILES
     if (files?.galleryFiles?.length) {
-      for (const file of files.galleryFiles) {
-        const result = await uploadToS3(file, serviceId, "galleryFiles")
+      await Promise.all(
+        files.galleryFiles.map(async (file: any) => {
+          const result = await uploadToS3(file, serviceId, "galleryFiles")
 
-        await prisma.serviceFile.create({
-          data: {
-            filename: result.fileName,
-            mimeType: file.mimetype,
-            url: result.key,
-            type: result.fileType,
-            serviceId: Number(serviceId)
-          }
+          await prisma.serviceFile.create({
+            data: {
+              filename: result.fileName,
+              mimeType: file.mimetype,
+              url: result.url,
+              type: result.fileType,
+              serviceId
+            }
+          })
         })
-      }
+      )
     }
 
-    return { message: "Files uploaded successfully" }
+    return { message: "Files synced successfully" }
   },
 
   // Helpers
