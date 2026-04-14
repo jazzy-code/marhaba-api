@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ClerkWebhooksController } from './clerkWebhooks.controller'
+import { ClerkWebhooksController } from './clerkWebhooks.controller.js'
 import bodyParser from 'body-parser'
 
 const router = Router()

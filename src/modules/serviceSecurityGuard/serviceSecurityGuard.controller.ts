@@ -1,5 +1,5 @@
 
-import { ServiceSecurityGuardService } from "./serviceSecurityGuard.service"
+import { ServiceSecurityGuardService } from "./serviceSecurityGuard.service.js"
 import type { Response } from "express"
 
 export const ServiceSecurityGuardController = {

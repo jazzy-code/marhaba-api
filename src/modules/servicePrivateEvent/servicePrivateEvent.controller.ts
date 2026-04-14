@@ -1,5 +1,5 @@
 
-import { ServicePrivateEventService } from "./servicePrivateEvent.service"
+import { ServicePrivateEventService } from "./servicePrivateEvent.service.js"
 import type { Response } from "express"
 
 export const ServicePrivateEventController = {

@@ -4,7 +4,7 @@ import type { Response, Request } from "express"
 import { HTTPError } from "@/middlewares/errorHandler";
 import { Webhook } from "svix";
 import { env } from "@/config/env";
-import { ClerkWebhooksService } from "./clerkWebhooks.service";
+import { ClerkWebhooksService } from "./clerkWebhooks.service.js";
 import { logger } from "@/utils/logger";
 
 const WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;

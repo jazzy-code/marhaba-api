@@ -1,5 +1,5 @@
 
-import { ServiceLuxuryCarService } from "./serviceLuxuryCar.service"
+import { ServiceLuxuryCarService } from "./serviceLuxuryCar.service.js"
 import type { Response } from "express"
 
 export const ServiceLuxuryCarController = {

@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { HTTPError } from "./errorHandler";
+import { HTTPError } from "./errorHandler.js";
 
 export const requireAdmin: RequestHandler = async (req, res, next) => {
   if (req.user.userType !== "ADMIN") {

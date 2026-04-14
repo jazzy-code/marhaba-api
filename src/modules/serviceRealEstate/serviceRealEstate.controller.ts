@@ -1,5 +1,5 @@
 
-import { ServiceRealEstateService } from "./serviceRealEstate.service"
+import { ServiceRealEstateService } from "./serviceRealEstate.service.js"
 import type { Response } from "express"
 
 export const ServiceRealEstateController = {

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ServiceYachtController } from './serviceYacht.controller'
+import { ServiceYachtController } from './serviceYacht.controller.js'
 import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()

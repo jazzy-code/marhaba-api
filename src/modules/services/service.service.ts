@@ -1,19 +1,19 @@
-import prisma from "@/lib/prisma";
-import { HTTPError } from "@/middlewares/errorHandler";
-import { ServiceRealEstateService } from "../serviceRealEstate/serviceRealEstate.service";
-import { ServiceLuxuryCarService } from "../serviceLuxuryCar/serviceLuxuryCar.service";
-import { ServiceYachtService } from "../serviceYacht/serviceYacht.service";
-import { ServiceLuxuryStayService } from "../serviceLuxuryStay/serviceLuxuryStay.service";
-import { ServiceJetService } from "../serviceJet/serviceJet.service";
-import { ServiceMedicalCareService } from "../serviceMedicalCare/serviceMedicalCare.service";
-import { ServiceSecurityGuardService } from "../serviceSecurityGuard/serviceSecurityGuard.service";
-import { ServicePrivateEventService } from "../servicePrivateEvent/servicePrivateEvent.service";
-import { ServicePrivateStaffService } from "../servicePrivateStaff/servicePrivateStaff.service";
-import { ServiceBeautySpaService } from "../serviceBeautySpa/serviceBeautySpa.service";
-import { ServiceGolfService } from "../serviceGolf/serviceGolf.service";
-import { ServiceTrainingCoachService } from "../serviceTrainingCoach/serviceTrainingCoach.service";
-import { nullToEmptyString } from "@/utils/serviceFields";
-import { deleteFromS3, getSignedUrlFromS3, uploadToS3 } from "@/services/s3.service";
+import prisma from "@/lib/prisma.js";
+import { HTTPError } from "@/middlewares/errorHandler.js";
+import { ServiceRealEstateService } from "../serviceRealEstate/serviceRealEstate.service.js";
+import { ServiceLuxuryCarService } from "../serviceLuxuryCar/serviceLuxuryCar.service.js";
+import { ServiceYachtService } from "../serviceYacht/serviceYacht.service.js";
+import { ServiceLuxuryStayService } from "../serviceLuxuryStay/serviceLuxuryStay.service.js";
+import { ServiceJetService } from "../serviceJet/serviceJet.service.js";
+import { ServiceMedicalCareService } from "../serviceMedicalCare/serviceMedicalCare.service.js";
+import { ServiceSecurityGuardService } from "../serviceSecurityGuard/serviceSecurityGuard.service.js";
+import { ServicePrivateEventService } from "../servicePrivateEvent/servicePrivateEvent.service.js";
+import { ServicePrivateStaffService } from "../servicePrivateStaff/servicePrivateStaff.service.js";
+import { ServiceBeautySpaService } from "../serviceBeautySpa/serviceBeautySpa.service.js";
+import { ServiceGolfService } from "../serviceGolf/serviceGolf.service.js";
+import { ServiceTrainingCoachService } from "../serviceTrainingCoach/serviceTrainingCoach.service.js";
+import { nullToEmptyString } from "@/utils/serviceFields.js";
+import { deleteFromS3, getSignedUrlFromS3, uploadToS3 } from "@/services/s3.service.js";
 
 
 const serviceModules: Record<string, any> = {

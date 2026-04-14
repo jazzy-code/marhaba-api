@@ -2,11 +2,11 @@ import express from "express"
 import cors from "cors"
 import "dotenv/config"
 import routes from "./routes.js"
-import webhooksRoutes from "./webhooks.routes"
+import webhooksRoutes from "./webhooks.routes.js"
 import { clerkClient, clerkMiddleware, getAuth } from "@clerk/express"
-import { requireAuth } from "./middlewares/auth.middleware"
-import { errorHandlerMiddleware, NotFoundError } from "./middlewares/errorHandler"
-import { httpLogger } from "./middlewares/logger.middleware"
+import { requireAuth } from "./middlewares/auth.middleware.js"
+import { errorHandlerMiddleware, NotFoundError } from "./middlewares/errorHandler.js"
+import { httpLogger } from "./middlewares/logger.middleware.js"
 
 const app = express()
 

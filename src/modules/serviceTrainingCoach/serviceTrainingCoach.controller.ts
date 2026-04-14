@@ -1,5 +1,5 @@
 
-import { ServiceTrainingCoachService } from "./serviceTrainingCoach.service"
+import { ServiceTrainingCoachService } from "./serviceTrainingCoach.service.js"
 import type { Response } from "express"
 
 export const ServiceTrainingCoachController = {

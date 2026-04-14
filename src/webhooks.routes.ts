@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import clerkWebhooksRoutes from './modules/clerkWebhooks/clerkWebhooks.routes'
+import clerkWebhooksRoutes from './modules/clerkWebhooks/clerkWebhooks.routes.js'
 
 const router = Router()
 

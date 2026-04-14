@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ServiceJetController } from './serviceJet.controller'
+import { ServiceJetController } from './serviceJet.controller.js'
 import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()

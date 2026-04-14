@@ -1,8 +1,8 @@
 
 import { getAuth } from "@clerk/express"
-import { ServiceService } from "./service.service"
+import { ServiceService } from "./service.service.js"
 import type { Response, Request } from "express"
-import { AuthService } from "../auth/auth.service"
+import { AuthService } from "../auth/auth.service.js"
 import { HTTPError } from "@/middlewares/errorHandler"
 
 export const ServiceController = {

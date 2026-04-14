@@ -1,6 +1,6 @@
 
 import { getAuth } from "@clerk/express"
-import { AuthService } from "./auth.service"
+import { AuthService } from "./auth.service.js"
 import type { Request, Response } from "express"
 import { HTTPError } from "@/middlewares/errorHandler"
 

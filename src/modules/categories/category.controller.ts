@@ -1,4 +1,4 @@
-import { CategoryService } from "./category.service"
+import { CategoryService } from "./category.service.js"
 import type { Response, Request } from "express"
 
 export const CategoryController = {

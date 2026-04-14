@@ -1,6 +1,6 @@
 import { getAuth } from "@clerk/express"
 import { RequestHandler } from "express"
-import { HTTPError } from "./errorHandler"
+import { HTTPError } from "./errorHandler.js"
 import prisma from "@/lib/prisma";
 
 export const requireAuth: RequestHandler = async (req, res, next) => {

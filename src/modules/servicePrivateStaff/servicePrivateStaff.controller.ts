@@ -1,5 +1,5 @@
 
-import { ServicePrivateStaffService } from "./servicePrivateStaff.service"
+import { ServicePrivateStaffService } from "./servicePrivateStaff.service.js"
 import type { Response } from "express"
 
 export const ServicePrivateStaffController = {

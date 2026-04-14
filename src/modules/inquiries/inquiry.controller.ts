@@ -1,4 +1,4 @@
-import { InquiryService } from "./inquiry.service"
+import { InquiryService } from "./inquiry.service.js"
 import type { Response, Request } from "express"
 
 export const InquiryController = {

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ServiceMedicalCareController } from './serviceMedicalCare.controller'
+import { ServiceMedicalCareController } from './serviceMedicalCare.controller.js'
 import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()

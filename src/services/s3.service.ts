@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 import { v4 as uuid } from "uuid"
-import { getFileType, FileType } from "../utils/fileType"
+import { getFileType, FileType } from "../utils/fileType.js"
 import { s3Client } from "@/config/s3Client"
 import { env } from "@/config/env"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"

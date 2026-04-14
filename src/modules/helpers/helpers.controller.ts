@@ -1,5 +1,5 @@
 
-import { HelpersService } from "./helpers.service"
+import { HelpersService } from "./helpers.service.js"
 import type { Request, Response } from "express"
 
 export const HelpersController = {

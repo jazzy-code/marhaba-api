@@ -3,7 +3,7 @@
     "rootDir": "./",
     "outDir": "dist",
 
-    "module": "esnext",
+    "module": "nodenext",
     "target": "ES2023",
     "lib": ["esnext"],
     "types": ["node", "express"],
@@ -20,7 +20,7 @@
     "skipLibCheck": true,
 
     "moduleDetection": "force",
-    "moduleResolution": "bundler",
+    "moduleResolution": "NodeNext",
 
     // "baseUrl": ".",
     "paths": {

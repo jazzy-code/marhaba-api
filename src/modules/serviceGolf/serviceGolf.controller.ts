@@ -1,5 +1,5 @@
 
-import { ServiceGolfService } from "./serviceGolf.service"
+import { ServiceGolfService } from "./serviceGolf.service.js"
 import type { Response } from "express"
 
 export const ServiceGolfController = {

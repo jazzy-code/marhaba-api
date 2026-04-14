@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { InquiryController } from './inquiry.controller'
+import { InquiryController } from './inquiry.controller.js'
 import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()

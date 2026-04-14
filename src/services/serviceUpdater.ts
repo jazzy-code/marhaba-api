@@ -1,6 +1,6 @@
-import prisma from "@/lib/prisma"
-import { extractServiceData, transformDataForPrisma } from "@/utils/serviceFields"
-import { updateManyToMany } from "./updateManyToMant"
+import prisma from "@/lib/prisma.js"
+import { extractServiceData, transformDataForPrisma } from "@/utils/serviceFields.js"
+import { updateManyToMany } from "./updateManyToMany.js"
 
 export const updateServiceWithRelation = async ({
   id,

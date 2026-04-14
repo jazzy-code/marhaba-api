@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ServicePrivateStaffController } from './servicePrivateStaff.controller'
+import { ServicePrivateStaffController } from './servicePrivateStaff.controller.js'
 import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()

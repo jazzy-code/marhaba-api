@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ServiceController } from './service.controller'
+import { ServiceController } from './service.controller.js'
 import { requireAdmin } from '@/middlewares/admin.middleware'
 import { uploadFiles } from '@/middlewares/upload.middleware'
 

@@ -1,5 +1,5 @@
 
-import { ServiceBeautySpaService } from "./serviceBeautySpa.service"
+import { ServiceBeautySpaService } from "./serviceBeautySpa.service.js"
 import type { Response } from "express"
 
 export const ServiceBeautySpaController = {

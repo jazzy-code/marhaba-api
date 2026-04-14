@@ -1,5 +1,5 @@
-import prisma from "@/lib/prisma"
-import { extractServiceData, transformDataForPrisma } from "@/utils/serviceFields"
+import prisma from "@/lib/prisma.js"
+import { extractServiceData, transformDataForPrisma } from "@/utils/serviceFields.js"
 import { getAuth } from "@clerk/express"
 
 export const createServiceWithRelation = async ({

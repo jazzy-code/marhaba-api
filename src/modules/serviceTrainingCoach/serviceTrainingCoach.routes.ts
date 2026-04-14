@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ServiceTrainingCoachController } from './serviceTrainingCoach.controller'
+import { ServiceTrainingCoachController } from './serviceTrainingCoach.controller.js'
 import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()

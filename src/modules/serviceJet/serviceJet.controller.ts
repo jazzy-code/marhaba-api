@@ -1,5 +1,5 @@
 
-import { ServiceJetService } from "./serviceJet.service"
+import { ServiceJetService } from "./serviceJet.service.js"
 import type { Response } from "express"
 
 export const ServiceJetController = {
