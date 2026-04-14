@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
 import "dotenv/config"
-import routes from "./routes"
+import routes from "./routes.js"
 import webhooksRoutes from "./webhooks.routes"
 import { clerkClient, clerkMiddleware, getAuth } from "@clerk/express"
 import { requireAuth } from "./middlewares/auth.middleware"
