@@ -1,8 +1,8 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 import { v4 as uuid } from "uuid"
 import { getFileType, FileType } from "../utils/fileType.js"
-import { s3Client } from "@/config/s3Client"
-import { env } from "@/config/env"
+import { s3Client } from "@/config/s3Client.js"
+import { env } from "@/config/env.js"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 const S3_BUCKET = env.AWS_S3_BUCKET_NAME

@@ -1,11 +1,10 @@
 
 import { WebhookEvent } from "@clerk/backend";
 import type { Response, Request } from "express"
-import { HTTPError } from "@/middlewares/errorHandler";
 import { Webhook } from "svix";
-import { env } from "@/config/env";
+import { env } from "@/config/env.js";
 import { ClerkWebhooksService } from "./clerkWebhooks.service.js";
-import { logger } from "@/utils/logger";
+import { logger } from "@/utils/logger.js";
 
 const WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
 

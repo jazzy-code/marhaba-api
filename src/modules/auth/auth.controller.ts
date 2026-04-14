@@ -2,7 +2,7 @@
 import { getAuth } from "@clerk/express"
 import { AuthService } from "./auth.service.js"
 import type { Request, Response } from "express"
-import { HTTPError } from "@/middlewares/errorHandler"
+import { HTTPError } from "@/middlewares/errorHandler.js"
 
 export const AuthController = {
   getAuthUser: async (req: Request, res: Response) => {

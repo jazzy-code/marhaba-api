@@ -1,8 +1,8 @@
-import prisma from "@/lib/prisma"
-import { HTTPError } from "@/middlewares/errorHandler";
-import { createServiceWithRelation } from "@/services/serviceCreator"
-import { updateServiceWithRelation } from "@/services/serviceUpdater"
-import { nullToEmptyString } from "@/utils/serviceFields"
+import prisma from "@/lib/prisma.js"
+import { HTTPError } from "@/middlewares/errorHandler.js";
+import { createServiceWithRelation } from "@/services/serviceCreator.js"
+import { updateServiceWithRelation } from "@/services/serviceUpdater.js"
+import { nullToEmptyString } from "@/utils/serviceFields.js"
 
 const baseFields = [
   'capacity',

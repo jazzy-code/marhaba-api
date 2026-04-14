@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.js";
 import { clerkClient } from "@clerk/express";
 
 export const ClerkWebhooksService = {

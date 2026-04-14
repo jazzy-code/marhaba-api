@@ -3,7 +3,7 @@ import { getAuth } from "@clerk/express"
 import { ServiceService } from "./service.service.js"
 import type { Response, Request } from "express"
 import { AuthService } from "../auth/auth.service.js"
-import { HTTPError } from "@/middlewares/errorHandler"
+import { HTTPError } from "@/middlewares/errorHandler.js"
 
 export const ServiceController = {
   create: async (req: Request, res: Response) => {

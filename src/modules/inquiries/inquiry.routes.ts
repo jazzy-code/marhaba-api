@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { InquiryController } from './inquiry.controller.js'
-import { requireAuth } from '@/middlewares/auth.middleware'
+import { requireAuth } from '@/middlewares/auth.middleware.js'
 
 const router = Router()
 
