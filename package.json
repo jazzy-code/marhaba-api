@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "prisma": "prisma",
     "seed": "prisma db seed",
-    "seed:run": "tsx prisma/seed.ts"
+    "seed:run": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
