@@ -572,7 +572,7 @@ export const ServiceService = {
 
     if (service?.serviceFiles?.length) {
       await Promise.all(
-        service.serviceFiles.map(async (file) => {
+        service.serviceFiles.map(async (file: any) => {
           await deleteFromS3(file.url)
 
           await prisma.serviceFile.delete({
@@ -599,11 +599,11 @@ export const ServiceService = {
     })
 
     const filesToDelete = currentFiles.filter(
-      (file) => !existingFileIds.includes(file.id)
+      (file: any) => !existingFileIds.includes(file.id)
     )
 
     await Promise.all(
-      filesToDelete.map(async (file) => {
+      filesToDelete.map(async (file: any) => {
         await deleteFromS3(file.url)
 
         await prisma.serviceFile.delete({

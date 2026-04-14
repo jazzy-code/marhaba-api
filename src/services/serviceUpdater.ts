@@ -33,7 +33,7 @@ export const updateServiceWithRelation = async ({
     }
   }
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: any) => {
 
     /**
      * 1️⃣ Obtener registro actual

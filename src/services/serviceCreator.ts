@@ -29,7 +29,7 @@ export const createServiceWithRelation = async ({
     }
   }
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: any) => {
     /**
      * 1️⃣ Crear service
      */
