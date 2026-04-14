@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { ServicePrivateEventController } from './servicePrivateEvent.controller.js'
-import { requireAuth } from '@/middlewares/auth.middleware'
+
 
 const router = Router()
 

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { ServiceSecurityGuardController } from './serviceSecurityGuard.controller.js'
-import { requireAuth } from '@/middlewares/auth.middleware'
+
 
 const router = Router()
 

@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { ServiceLuxuryStayController } from './serviceLuxuryStay.controller.js'
-import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()
 

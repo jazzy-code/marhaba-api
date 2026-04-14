@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { ServiceLuxuryCarController } from './serviceLuxuryCar.controller.js'
-import { requireAuth } from '@/middlewares/auth.middleware'
 
 const router = Router()
 

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { ServiceController } from './service.controller.js'
-import { requireAdmin } from '@/middlewares/admin.middleware'
-import { uploadFiles } from '@/middlewares/upload.middleware'
+import { requireAdmin } from '@/middlewares/admin.middleware.js'
+import { uploadFiles } from '@/middlewares/upload.middleware.js'
 
 const router = Router()
 
