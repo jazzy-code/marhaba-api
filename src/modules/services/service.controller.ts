@@ -17,9 +17,9 @@ export const ServiceController = {
       throw new HTTPError(401, "User not exists internally")
     }
 
-    const category = await ServiceService.create({ ...req.body, userId: user.id })
+    const service = await ServiceService.create({ ...req.body, userId: user.id })
 
-    res.json(category)
+    res.json(service)
   },
 
   list: async (req: Request, res: Response) => {
@@ -34,32 +34,33 @@ export const ServiceController = {
 
   get: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
-    const category = await ServiceService.findById(id, req.user)
-    res.json(category)
+    const service = await ServiceService.findById(id, req.user)
+    res.json(service)
   },
 
   getPublic: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
-    const category = await ServiceService.findByIdPublic(id)
-    res.json(category)
+    const service = await ServiceService.findByIdPublic(id)
+    res.json(service)
   },
 
   update: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
-    const category = await ServiceService.update(id, req.body)
-    res.json(category)
+    const service = await ServiceService.update(id, req.body)
+    res.json(service)
   },
 
   approve: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
-    const category = await ServiceService.approve(id)
-    res.json(category)
+    const service = await ServiceService.approve(id)
+    res.json(service)
   },
 
   reject: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
-    const category = await ServiceService.reject(id)
-    res.json(category)
+    const reason = req.body.reason
+    const service = await ServiceService.reject(id, reason, req.user)
+    res.json(service)
   },
 
   delete: async (req: Request, res: Response) => {

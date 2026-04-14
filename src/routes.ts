@@ -6,6 +6,7 @@ import categoryRoutes from '@/modules/categories/category.routes'
 import servicesRoutes from '@/modules/services/service.routes'
 import servicesPublicRoutes from '@/modules/services/service.public.routes'
 import helpersRoutes from '@/modules/helpers/helpers.routes'
+import inquiriesRoutes from '@/modules/inquiries/inquiry.routes'
 
 import serviceRealEstateRoutes from '@/modules/serviceRealEstate/serviceRealEstate.routes'
 import serviceLuxuryCarRoutes from '@/modules/serviceLuxuryCar/serviceLuxuryCar.routes'
@@ -28,6 +29,7 @@ router.use('/auth', requireAuth, authRoutes)
 
 router.use('/categories', categoryRoutes)
 router.use('/helpers', helpersRoutes)
+router.use('/inquiries', inquiriesRoutes)
 router.use('/services', requireAuth, servicesRoutes)
 
 router.use('/service-real-estate', serviceRealEstateRoutes)

@@ -11,6 +11,9 @@ CREATE TYPE "CallToActionType" AS ENUM ('INTERNAL', 'EXTERNAL');
 CREATE TYPE "FileType" AS ENUM ('IMAGE', 'VIDEO', 'DOCUMENT');
 
 -- CreateEnum
+CREATE TYPE "InquiryStatus" AS ENUM ('NEW', 'CONTACTED');
+
+-- CreateEnum
 CREATE TYPE "ServiceModality" AS ENUM ('SALE', 'RENT');
 
 -- CreateEnum
@@ -172,6 +175,34 @@ CREATE TABLE "ServiceFile" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ServiceFile_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ServiceComment" (
+    "id" SERIAL NOT NULL,
+    "comment" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "serviceId" INTEGER NOT NULL,
+    "serviceStatusId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ServiceComment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Inquiry" (
+    "id" SERIAL NOT NULL,
+    "fullName" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT,
+    "message" TEXT,
+    "status" "InquiryStatus" NOT NULL DEFAULT 'NEW',
+    "isArchived" BOOLEAN NOT NULL DEFAULT false,
+    "serviceId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Inquiry_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -881,6 +912,18 @@ ALTER TABLE "Service" ADD CONSTRAINT "Service_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "ServiceFile" ADD CONSTRAINT "ServiceFile_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ServiceComment" ADD CONSTRAINT "ServiceComment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ServiceComment" ADD CONSTRAINT "ServiceComment_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ServiceComment" ADD CONSTRAINT "ServiceComment_serviceStatusId_fkey" FOREIGN KEY ("serviceStatusId") REFERENCES "ServiceStatus"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Inquiry" ADD CONSTRAINT "Inquiry_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ServiceRealEstate" ADD CONSTRAINT "ServiceRealEstate_realEstateTypeId_fkey" FOREIGN KEY ("realEstateTypeId") REFERENCES "RealEstateType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

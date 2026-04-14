@@ -528,7 +528,7 @@ export const ServiceService = {
     })
   },
 
-  reject: async (id: number) => {
+  reject: async (id: number, reason: string = "", user: any) => {
     const service = await prisma.service.findUnique({
       where: { id }
     })
@@ -537,20 +537,51 @@ export const ServiceService = {
       throw new HTTPError(404, "Service not found")
     }
 
-    return await prisma.service.update({
+    await prisma.service.update({
       where: { id },
       data: { serviceStatusId: 3 }
     })
+
+    if (reason) {
+      await prisma.serviceComment.create({
+        data: { comment: reason, serviceId: id, userId: user.id, serviceStatusId: 3 }
+      })
+    }
+
+    return { message: "Service rejected succesfully" }
   },
 
   delete: async (id: number) => {
     const service = await prisma.service.findUnique({
-      where: { id }
+      where: { id },
+      include: { serviceFiles: true }
     })
 
     if (!service) {
       throw new HTTPError(404, "Service not found")
     }
+
+    // Delete files from S3
+    if (service?.heroImageUrl) {
+      await deleteFromS3(service.heroImageUrl)
+    }
+
+    if (service?.providerLogoUrl) {
+      await deleteFromS3(service.providerLogoUrl)
+    }
+
+    if (service?.serviceFiles?.length) {
+      await Promise.all(
+        service.serviceFiles.map(async (file) => {
+          await deleteFromS3(file.url)
+
+          await prisma.serviceFile.delete({
+            where: { id: file.id }
+          })
+        })
+      )
+    }
+    // Delete files from S3
 
     return await prisma.service.delete({
       where: { id }
@@ -567,13 +598,9 @@ export const ServiceService = {
       where: { serviceId }
     })
 
-    console.log("existingFileIds", existingFileIds)
-
     const filesToDelete = currentFiles.filter(
       (file) => !existingFileIds.includes(file.id)
     )
-
-    console.log("filesToDelete", filesToDelete)
 
     await Promise.all(
       filesToDelete.map(async (file) => {

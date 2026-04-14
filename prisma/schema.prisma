@@ -19,15 +19,16 @@ enum UserType {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  clerkId   String    @unique
-  email     String    @unique
-  firstName String?
-  lastName  String?
-  userType  UserType  @default(USER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  services  Service[]
+  id              Int              @id @default(autoincrement())
+  clerkId         String           @unique
+  email           String           @unique
+  firstName       String?
+  lastName        String?
+  userType        UserType         @default(USER)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  services        Service[]
+  serviceComments ServiceComment[]
 }
 
 model Category {
@@ -85,9 +86,10 @@ enum CallToActionType {
 }
 
 model ServiceStatus {
-  id       Int       @id @default(autoincrement())
-  name     String
-  services Service[]
+  id              Int              @id @default(autoincrement())
+  name            String
+  services        Service[]
+  serviceComments ServiceComment[]
 }
 
 model ServiceType {
@@ -149,6 +151,8 @@ model Service {
   serviceGolf          ServiceGolf?
   serviceTrainingCoach ServiceTrainingCoach?
   serviceFiles         ServiceFile[]
+  serviceComments      ServiceComment[]
+  inquiries            Inquiry[]
 }
 
 enum FileType {
@@ -167,6 +171,37 @@ model ServiceFile {
   service   Service  @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ServiceComment {
+  id              Int           @id @default(autoincrement())
+  comment         String
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  serviceId       Int
+  service         Service       @relation(fields: [serviceId], references: [id])
+  serviceStatusId Int
+  serviceStatus   ServiceStatus @relation(fields: [serviceStatusId], references: [id], onUpdate: Cascade, onDelete: Restrict)
+  createdAt       DateTime      @default(now())
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+}
+
+model Inquiry {
+  id         Int           @id @default(autoincrement())
+  fullName   String
+  email      String
+  phone      String?
+  message    String?
+  status     InquiryStatus @default(NEW)
+  isArchived Boolean       @default(false)
+  serviceId  Int
+  service    Service       @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 }
 
 enum ServiceModality {
