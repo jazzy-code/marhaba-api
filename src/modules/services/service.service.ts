@@ -1,5 +1,5 @@
-import prisma from "@/lib/prisma.js";
-import { HTTPError } from "@/middlewares/errorHandler.js";
+import prisma from "../../lib/prisma.js";
+import { HTTPError } from "../../middlewares/errorHandler.js";
 import { ServiceRealEstateService } from "../serviceRealEstate/serviceRealEstate.service.js";
 import { ServiceLuxuryCarService } from "../serviceLuxuryCar/serviceLuxuryCar.service.js";
 import { ServiceYachtService } from "../serviceYacht/serviceYacht.service.js";
@@ -12,8 +12,8 @@ import { ServicePrivateStaffService } from "../servicePrivateStaff/servicePrivat
 import { ServiceBeautySpaService } from "../serviceBeautySpa/serviceBeautySpa.service.js";
 import { ServiceGolfService } from "../serviceGolf/serviceGolf.service.js";
 import { ServiceTrainingCoachService } from "../serviceTrainingCoach/serviceTrainingCoach.service.js";
-import { nullToEmptyString } from "@/utils/serviceFields.js";
-import { deleteFromS3, getSignedUrlFromS3, uploadToS3 } from "@/services/s3.service.js";
+import { nullToEmptyString } from "../../utils/serviceFields.js";
+import { deleteFromS3, getSignedUrlFromS3, uploadToS3 } from "../../services/s3.service.js";
 
 
 const serviceModules: Record<string, any> = {

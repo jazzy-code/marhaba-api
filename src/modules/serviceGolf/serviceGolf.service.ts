@@ -1,8 +1,8 @@
-import prisma from "@/lib/prisma.js"
-import { HTTPError } from "@/middlewares/errorHandler.js";
-import { createServiceWithRelation } from "@/services/serviceCreator.js"
-import { updateServiceWithRelation } from "@/services/serviceUpdater.js"
-import { nullToEmptyString } from "@/utils/serviceFields.js"
+import prisma from "../../lib/prisma.js"
+import { HTTPError } from "../../middlewares/errorHandler.js";
+import { createServiceWithRelation } from "../../services/serviceCreator.js"
+import { updateServiceWithRelation } from "../../services/serviceUpdater.js"
+import { nullToEmptyString } from "../../utils/serviceFields.js"
 
 const baseFields = [
   'totalHoles',
