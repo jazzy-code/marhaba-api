@@ -208,6 +208,9 @@ export const ServiceService = {
         city: true,
         region: true,
         serviceFiles: true,
+        serviceComments: {
+          orderBy: { createdAt: "desc" },
+        },
 
         // Services
         serviceRealEstate: {
@@ -278,9 +281,16 @@ export const ServiceService = {
             medicalCareHasAttentions: { include: { medicalCareAttention: true } }
           }
         },
-        serviceSecurityGuard: { include: { securityGuardHasProfiles: true, securityGuardHasLanguages: true } },
+        serviceSecurityGuard: {
+          include: {
+            securityGuardBackgroundType: true,
+            securityGuardHasProfiles: true,
+            securityGuardHasLanguages: true
+          }
+        },
         servicePrivateEvent: {
           include: {
+            privateEventType: true,
             privateEventHasAmenities: {
               include: {
                 privateEventAmenity: true
@@ -429,9 +439,16 @@ export const ServiceService = {
             medicalCareHasAttentions: { include: { medicalCareAttention: true } }
           }
         },
-        serviceSecurityGuard: { include: { securityGuardHasProfiles: true, securityGuardHasLanguages: true } },
+        serviceSecurityGuard: {
+          include: {
+            securityGuardBackgroundType: true,
+            securityGuardHasProfiles: true,
+            securityGuardHasLanguages: true
+          }
+        },
         servicePrivateEvent: {
           include: {
+            privateEventType: true,
             privateEventHasAmenities: {
               include: {
                 privateEventAmenity: true
