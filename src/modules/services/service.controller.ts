@@ -84,6 +84,11 @@ export const ServiceController = {
     res.json(list)
   },
 
+  listLatestPublic: async (_: any, res: Response) => {
+    const list = await ServiceService.findAllLatestPublic()
+    res.json(list)
+  },
+
   uploadFiles: async (req: Request, res: Response) => {
     const id = Number(req.params.id)
 

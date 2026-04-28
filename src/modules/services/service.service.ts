@@ -193,6 +193,37 @@ export const ServiceService = {
     }
   },
 
+  findAllLatestPublic: async () => {
+    return prisma.service.findMany({
+      take: 10,
+      skip: 0,
+      where: {
+        serviceStatusId: 2 // Only fetch Approved services
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        serviceType: {
+          include: {
+          category: true
+        }},
+
+        // Services
+        serviceRealEstate: true,
+        serviceLuxuryCar: true,
+        serviceYacht: true,
+        serviceJet: true,
+        serviceLuxuryStay: true,
+        serviceMedicalCare: true,
+        serviceSecurityGuard: true,
+        servicePrivateEvent: true,
+        servicePrivateStaff: true,
+        serviceBeautySpa: true,
+        serviceGolf: true,
+        serviceTrainingCoach: true,
+      }
+    })
+  },
+
   findById: async (id: number, user: any) => {
     const where: any = { id }
 
