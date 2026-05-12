@@ -12,6 +12,8 @@ export const ClerkWebhooksService = {
           firstName: first_name,
           lastName: last_name,
           userType: "USER",
+          acceptedPrivacyAt: new Date(),
+          acceptedTermsAt: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         }

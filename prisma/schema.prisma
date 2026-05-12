@@ -19,16 +19,20 @@ enum UserType {
 }
 
 model User {
-  id              Int              @id @default(autoincrement())
-  clerkId         String           @unique
-  email           String           @unique
-  firstName       String?
-  lastName        String?
-  userType        UserType         @default(USER)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  services        Service[]
-  serviceComments ServiceComment[]
+  id                Int              @id @default(autoincrement())
+  clerkId           String           @unique
+  email             String           @unique
+  firstName         String?
+  lastName          String?
+  userType          UserType         @default(USER)
+  acceptedTermsAt   DateTime?
+  acceptedPrivacyAt DateTime?
+  consentVersion    String?          @default("v1")
+  ipAddress         String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  services          Service[]
+  serviceComments   ServiceComment[]
 }
 
 model Category {
