@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Inquiry" ADD COLUMN     "acceptedTermsAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP;

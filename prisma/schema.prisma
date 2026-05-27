@@ -195,17 +195,18 @@ enum InquiryStatus {
 }
 
 model Inquiry {
-  id         Int           @id @default(autoincrement())
-  fullName   String
-  email      String
-  phone      String?
-  message    String?
-  status     InquiryStatus @default(NEW)
-  isArchived Boolean       @default(false)
-  serviceId  Int
-  service    Service       @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  id              Int           @id @default(autoincrement())
+  fullName        String
+  email           String
+  phone           String?
+  message         String?
+  status          InquiryStatus @default(NEW)
+  isArchived      Boolean       @default(false)
+  acceptedTermsAt DateTime?     @default(now())
+  serviceId       Int
+  service         Service       @relation(fields: [serviceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 enum ServiceModality {

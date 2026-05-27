@@ -1,8 +1,15 @@
 import prisma from "../../lib/prisma.js";
+import { HTTPError } from "../../middlewares/errorHandler.js";
 
 
 export const InquiryService = {
   create: (data: any) => {
+    const { acceptTerms } = data
+
+    if (!acceptTerms) {
+      throw new HTTPError(400, "acceptTerms is required and must be true")
+    }
+    delete data.acceptTerms
     return prisma.inquiry.create({ data })
   },
 
