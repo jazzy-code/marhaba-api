@@ -14,6 +14,7 @@ import { ServiceGolfService } from "../serviceGolf/serviceGolf.service.js";
 import { ServiceTrainingCoachService } from "../serviceTrainingCoach/serviceTrainingCoach.service.js";
 import { nullToEmptyString } from "../../utils/serviceFields.js";
 import { deleteFromS3, getSignedUrlFromS3, uploadToS3 } from "../../services/s3.service.js";
+import { sendTemplateEmail } from "../../services/email/email.service.js";
 
 
 const serviceModules: Record<string, any> = {
@@ -32,7 +33,7 @@ const serviceModules: Record<string, any> = {
 }
 
 export const ServiceService = {
-  create: (data: any) => {
+  create: async (data: any, user: any) => {
     const { serviceType } = data
 
     if (!serviceType) {
@@ -45,7 +46,24 @@ export const ServiceService = {
       throw new HTTPError(400, `Unsupported serviceType: ${serviceType}`)
     }
 
-    return module.create(data)
+    const service = await module.create(data)
+
+    await sendTemplateEmail(
+      {
+        to: process.env.MAIL_ADMIN_RECIPIENT_EMAIL || "javiertorresm2000@gmail.com", 
+        subject: "New Service Submitted", 
+        templateName: "service-submitted", 
+        variables: { 
+          title: data.title, 
+          serviceType: data.serviceType,
+          serviceId: service.service.id,
+          userName: user.firtName + " " + user.lastName,
+          userEmail: user.email
+        }, 
+      }
+    )
+
+    return service
   },
 
   findAll: async (params: any, user: any) => {

@@ -36,6 +36,7 @@ export async function sendTemplateEmail({
 }: SendTemplateEmailOptions) {
   const defaultVariables = {
     appWebUrl: "https://marhabamarbella.com",
+    appAdminUrl: "https://admin.marhabamarbella.com",
     logoUrl: "https://marhabamarbella.com/images/marhaba-marbella-logo.svg",
     year: new Date().getFullYear()
   }

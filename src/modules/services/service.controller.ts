@@ -17,7 +17,7 @@ export const ServiceController = {
       throw new HTTPError(401, "User not exists internally")
     }
 
-    const service = await ServiceService.create({ ...req.body, userId: user.id })
+    const service = await ServiceService.create({ ...req.body, userId: user.id }, user)
 
     res.json(service)
   },
