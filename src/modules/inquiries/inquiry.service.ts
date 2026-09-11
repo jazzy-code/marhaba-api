@@ -1,16 +1,50 @@
 import prisma from "../../lib/prisma.js";
 import { HTTPError } from "../../middlewares/errorHandler.js";
+import { sendTemplateEmail } from "../../services/email/email.service.js";
 
 
 export const InquiryService = {
-  create: (data: any) => {
+  create: async (data: any) => {
     const { acceptTerms } = data
 
     if (!acceptTerms) {
       throw new HTTPError(400, "acceptTerms is required and must be true")
     }
     delete data.acceptTerms
-    return prisma.inquiry.create({ data })
+
+    const inquire = await prisma.inquiry.create({ data })
+
+    const service = await prisma.service.findUnique({
+      where: {
+        id: inquire.serviceId
+      },
+      include: {
+        user: true,
+        serviceType: true
+      }
+    })
+
+    if (!service) {
+      throw new HTTPError(400, "Service not found")
+    }
+
+    await sendTemplateEmail({
+      to: process.env.MAIL_ADMIN_RECIPIENT_EMAIL || "javiertorresm2000@gmail.com", 
+      subject: "New Inquire Submitted", 
+      templateName: "inquiry-submitted", 
+      variables: { 
+        fullName: data.fullName,
+        email: data.email,
+        phoneNumber: data.phone,
+        message: data.message,
+        serviceTitle: service.title,
+        serviceId: service.id,
+        serviceType: service.serviceType.name,
+        userName: service.user.firstName + " " + service.user.lastName,
+        userEmail: service.user.email
+      }
+    })
+    return inquire
   },
 
   findAll: async (params: any, user: any) => {
